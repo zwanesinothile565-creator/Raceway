@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Raceway.Models;
 // Add profile data for applicatin users by addimg properties to the IdentifyerUser class
 
-    public enum Gender
+public enum Gender
 {
     Male,
 
@@ -14,13 +14,13 @@ namespace Raceway.Models;
     PreferNotToSay
 }
 
-    public class ApplicationUser:IdentityUser
-    {
+public class ApplicationUser : IdentityUser
+{
     [Required, MaxLength(50)]
     public string FirstName { get; set; } = string.Empty;
 
     [Required, MaxLength(50)]
-    public string LastName { get; set; }  = String.Empty;
+    public string LastName { get; set; } = String.Empty;
 
     public Gender Gender { get; set; }
 
@@ -31,5 +31,5 @@ namespace Raceway.Models;
 
     public string FullName => $"{FirstName} {LastName}";
 
-    }
+}
 
