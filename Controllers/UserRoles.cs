@@ -1,61 +1,61 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Raceway.Models;
 using Raceway.Models.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Raceway.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class UserRoles : Controller
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly RoleManager<IdentityRole> roleManager; 
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public UserRoles(
-            UserManager<IdentityUser> UserManager,
+            UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager
-
 
             )
         {
-            userManager = UserManager;
-            roleManager = roleManager;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
-           
-        //Get: /UserRoles
+
+        //GET: /UserRoles
         public async Task<IActionResult> Index()
         {
-            var users = await userManager.Users.ToListAsync();
-            var UserRolesViewModel = new List<UserRolesViewModel>();
+            var users = await _userManager.Users.ToListAsync();
+            var userRolesViewModel = new List<UserRolesViewModel>();
 
-            foreach( var user in users)
+            foreach (var user in users)
             {
                 var thisViewModel = new UserRolesViewModel
                 {
                     UserId = user.Id,
                     Email = user.Email ?? "",
                     UserName = user.UserName ?? "",
-                    Roles = await userManager.GetRolesAsync(user)
+                    Roles = await _userManager.GetRolesAsync(user)
                 };
 
-                UserRolesViewModel.Add(thisViewModel);
+                userRolesViewModel.Add(thisViewModel);
             }
-            return View(UserRolesViewModel);
+
+            return View(userRolesViewModel);
         }
 
-
-        //Get: / UserRoles/Manager?UserId=xxx
-        public async Task<IActionResult> Manage (String UserId)
+        //GET: /UserRoles/Manager?userId=xxx
+        public async Task<IActionResult> Manage(string userId)
         {
 
-            ViewBag.UserId = UserId;
+            ViewBag.userId = userId;
 
-            var user = await userManager.FindByIdAsync(UserId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"User with Id ={UserId} cannot be found!!";
+                ViewBag.ErrorMessage = $"User with Id = {userId} cannot be found!!";
                 return View("Not Found");
             }
 
@@ -63,7 +63,7 @@ namespace Raceway.Controllers
 
             var model = new List<ManageUserRolesViewModel>();
 
-            foreach(var role in roleManager.Roles.ToList())
+            foreach (var role in _roleManager.Roles.ToList())
             {
                 var userRolesViewModel = new ManageUserRolesViewModel
                 {
@@ -71,14 +71,14 @@ namespace Raceway.Controllers
                     RoleName = role.Name ?? ""
                 };
 
-                if(await userManager.IsInRoleAsync(user, role.Name!))
+                if (await _userManager.IsInRoleAsync(user, role.Name!))
                 {
                     userRolesViewModel.isSelected = true;
 
                 }
                 else
                 {
-                    userRolesViewModel.isSelected= false;
+                    userRolesViewModel.isSelected = false;
                 }
 
                 model.Add(userRolesViewModel);
@@ -86,20 +86,19 @@ namespace Raceway.Controllers
             return View(model);
         }
 
-        //Post: /UserRoles/Manage 
+        //POST: /UserRoles/Manage
         [HttpPost]
         [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> Manage (List<ManageUserRolesViewModel> model, string userId)
+        public async Task<IActionResult> Manage(List<ManageUserRolesViewModel> model, string userId)
         {
-            var user = await userManager.FindByIdAsync(userId);
-            if(user == null)
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
             {
                 return View("NotFound");
             }
 
-            var roles = await userManager.GetRolesAsync(user);
-            var result = await userManager.RemoveFromRolesAsync(user, roles);
+            var roles = await _userManager.GetRolesAsync(user);
+            var result = await _userManager.RemoveFromRolesAsync(user, roles);
 
             if (!result.Succeeded)
             {
@@ -107,11 +106,11 @@ namespace Raceway.Controllers
                 return View(model);
             }
 
-            result = await userManager.AddToRoleAsync(user, model.Where(x => x.isSelected).Select(y => y.RoleName));
+            result = await _userManager.AddToRolesAsync(user, model.Where(x => x.isSelected).Select(y => y.RoleName));
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", "Cannot add selected roles to user!");
+                ModelState.AddModelError("", "Cannnot add selected roles to user!");
                 return View(model);
             }
 
