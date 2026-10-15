@@ -5,7 +5,7 @@ using Raceway.Models;
 namespace Raceway.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-    {
+    {ssss
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
