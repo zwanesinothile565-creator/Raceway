@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Raceway.Models;
 using Raceway.Models.ViewModels;
+using Raceway.ViewModels;
 
 namespace Raceway.Controllers
 {
@@ -73,12 +74,12 @@ namespace Raceway.Controllers
 
                 if (await _userManager.IsInRoleAsync(user, role.Name!))
                 {
-                    userRolesViewModel.isSelected = true;
+                    userRolesViewModel.IsSelected = true;
 
                 }
                 else
                 {
-                    userRolesViewModel.isSelected = false;
+                    userRolesViewModel.IsSelected = false;
                 }
 
                 model.Add(userRolesViewModel);
@@ -106,7 +107,7 @@ namespace Raceway.Controllers
                 return View(model);
             }
 
-            result = await _userManager.AddToRolesAsync(user, model.Where(x => x.isSelected).Select(y => y.RoleName));
+            result = await _userManager.AddToRolesAsync(user, model.Where(x => x.IsSelected).Select(y => y.RoleName));
 
             if (!result.Succeeded)
             {

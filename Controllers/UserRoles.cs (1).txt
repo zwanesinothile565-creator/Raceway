@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using RunWayy.Models.ViewModels;
+using Raceway.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Client;
-using RunWayy.Data;
+using Raceway.Data;
 
-namespace RunWayy.Controllers
+namespace Raceway.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class UserRoles : Controller
